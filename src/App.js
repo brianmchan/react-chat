@@ -1,6 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from './firebase';
 
 function App() {
+  const [channels, setChannels] = useState([]);
+
+  useEffect(() => {
+    return db.collection('channels').onSnapshot((snapshot) => {
+      const docs = [];
+
+      snapshot.forEach((doc) => {
+        docs.push({
+          ...doc.data(),
+          id: doc.id
+        });
+      });
+
+      setChannels(docs);
+    });
+  }, []);
+
   return (
     <div className="App">
       <div className="Nav">
@@ -11,17 +29,16 @@ function App() {
             src="https://placekitten.com/64/64"
           />
           <div>
-            <div>Ryan Peterson Florence</div>
+            <div>Brian Chan</div>
             <div>
               <button className="text-button">log out</button>
             </div>
           </div>
         </div>
         <nav className="ChannelNav">
-          <a href="/channel/awesome"># awesome</a>
-          <a className="active" href="/channel/general">
-            # general
-          </a>
+          {channels.map(channel => (
+            <a href={`/channel/${channel.id}`}># {channel.id}</a>
+          ))}
         </nav>
       </div>
       <div className="Channel">
@@ -44,7 +61,7 @@ function App() {
                 <div className="Avatar" />
                 <div className="Author">
                   <div>
-                    <span className="UserName">Ryan Florence </span>
+                    <span className="UserName">Brian Chan </span>
                     <span className="TimeStamp">3:37 PM</span>
                   </div>
                   <div className="MessageContent">Alright, lets do this.</div>
@@ -65,7 +82,7 @@ function App() {
           <div>
             <div className="Member">
               <div className="MemberStatus offline" />
-              Ryan Florence
+              Brian Chan
             </div>
             <div className="Member">
               <div className="MemberStatus online" />
