@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Nav from './Nav';
 import Channel from './Channel';
-import { firebase } from './firebase';
+import { firebase, db } from './firebase';
 
 function App() {
   const user = useAuth();
@@ -9,7 +9,7 @@ function App() {
   return user ? (
     <div className="App">
       <Nav user={user} />
-      <Channel />
+      <Channel user={user} />
     </div>
   ) : (
     <Login />
@@ -48,13 +48,21 @@ function useAuth() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    return firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        setUser({
-          displayName: user.displayName,
-          photoUrl: user.photoURL,
-          uid: user.uid
-        });
+    return firebase.auth().onAuthStateChanged((firebaseUser) => {
+      if (firebaseUser) {
+        const user = {
+          displayName: firebaseUser.displayName,
+          photoUrl: firebaseUser.photoURL,
+          uid: firebaseUser.uid
+        };
+
+        setUser(user);
+
+        db
+          .collection('users')
+          .doc(user.uid)
+          .set(user, { merge: true });
+
       } else {
         setUser(null);
       }
