@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import useCollection from './useCollection';
 import { db } from './firebase';
 
-function Messages() {
+function Messages({ channelId }) {
   const messages = useCollection(
-    'channels/general/messages',
+    `channels/${channelId}/messages`,
     'createdAt'
   );
 
@@ -42,13 +42,13 @@ function useDoc(path) {
   const [doc, setDoc] = useState([]);
 
   useEffect(() => {
-    db.doc(path).onSnapshot((doc) => {
+    return db.doc(path).onSnapshot((doc) => {
       setDoc({
         ...doc.data(),
         id: doc.id
       });
     });
-  });
+  }, [path]);
 
   return doc;
 }
