@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import useCollection from './useCollection';
-import { db } from './firebase';
+import useDocWithCache from './useDocWithCache';
 
 function Messages({ channelId }) {
   const messages = useCollection(
@@ -38,23 +38,8 @@ function Messages({ channelId }) {
   );
 }
 
-function useDoc(path) {
-  const [doc, setDoc] = useState([]);
-
-  useEffect(() => {
-    return db.doc(path).onSnapshot((doc) => {
-      setDoc({
-        ...doc.data(),
-        id: doc.id
-      });
-    });
-  }, [path]);
-
-  return doc;
-}
-
 function FirstMessageFromUser({ message, showDay }) {
-  const author = useDoc(message.user.path);
+  const author = useDocWithCache(message.user.path);
 
   return (
     <div key={message.id}>
